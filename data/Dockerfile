@@ -1,5 +1,4 @@
-FROM python:3.9-slim
-
+FROM python:3.9
 WORKDIR /usr/src/app
 COPY . .
 RUN pip install pymongo
