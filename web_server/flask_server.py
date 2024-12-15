@@ -5,15 +5,13 @@ import certifi
 
 app = Flask(__name__)
 
-# MongoDB 연결 설정
-client = MongoClient('mongodb+srv://jungbin1486:j3727416!!@cluster0.auzrugj.mongodb.net/', tlsCAFile=certifi.where())
+client = MongoClient('--------변경예정--------', tlsCAFile=certifi.where())
 db = client['focus_data']
 collection = db['focus']
 
 
 @app.route('/')
 def index():
-    # MongoDB에서 데이터 가져오기
     data = list(collection.find())
     return render_template('dashboard.html', data=data)
 
@@ -31,10 +29,8 @@ def get_focus_data():
     lecture_name = request.args.get('lecture_name')
     date_str = request.args.get('date')
 
-    # 날짜 형식을 맞춰서 조회
     date_obj = datetime.strptime(date_str, "%Y-%m-%d")
 
-    # 해당 강의와 날짜에 맞는 데이터를 MongoDB에서 조회
     result = collection.find_one({'lecture_name': lecture_name, 'date': date_obj})
 
     if result:
@@ -49,13 +45,11 @@ def get_focus_data():
 def get_focus_percentage():
     lecture_name = request.args.get('lecture_name')
 
-    # MongoDB에서 해당 강의에 대한 모든 데이터를 조회
     focus_data = collection.find({'lecture_name': lecture_name})
 
     total_focused = 0
     total_students = 0
 
-    # 평균 집중도를 계산
     for data in focus_data:
         for time_data in data.get('elapsed_time_data', []):
             total_focused += time_data['focused_students']
@@ -75,11 +69,9 @@ def get_term_data():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
 
-    # 날짜 형식 변환
     start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
     end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
 
-    # 해당 기간 동안의 데이터를 조회
     term_data = collection.find({
         'lecture_name': lecture_name,
         'date': {'$gte': start_date, '$lte': end_date}
@@ -88,7 +80,6 @@ def get_term_data():
     dates = []
     unfocused_students_list = []
 
-    # 결과 데이터를 날짜별로 정리
     for data in term_data:
         unfocused_count = 0
         for time_data in data.get('elapsed_time_data', []):
@@ -109,10 +100,8 @@ def get_hourly_data():
     lecture_name = request.args.get('lecture_name')
     date_str = request.args.get('date')
 
-    # 날짜 형식을 맞춰서 조회
     date_obj = datetime.strptime(date_str, "%Y-%m-%d")
 
-    # 해당 강의와 날짜에 맞는 데이터를 MongoDB에서 조회
     result = collection.find_one({'lecture_name': lecture_name, 'date': date_obj})
 
     if result:
@@ -125,7 +114,6 @@ def get_hourly_data():
             focused_students = time_data.get('focused_students', 0)
             unfocused_students = time_data.get('unfocused_students', 0)
 
-            # 시간별로 집중도 저장
             if hour not in hourly_focus_data:
                 hourly_focus_data[hour] = {
                     'focused_students': 0,
@@ -139,6 +127,5 @@ def get_hourly_data():
         return jsonify({'error': '해당 날짜의 데이터를 찾을 수 없습니다.'}), 404
 
 
-# Flask 앱 실행
 if __name__ == '__main__':
     app.run(debug=True, port=5004)
