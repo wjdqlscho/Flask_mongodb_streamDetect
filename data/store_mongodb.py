@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 # MongoDB 연결
 def connect_to_mongodb():
-    client = MongoClient('mongodb+srv://jungbin1486:j3727416!!@cluster0.auzrugj.mongodb.net/')
+    client = MongoClient('------')
     return client['focus_data'], client['focus_data']['example_datasets']
 
 # JSON 파일에서 데이터 읽기
